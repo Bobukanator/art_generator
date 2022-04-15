@@ -1,0 +1,6 @@
+# local env files
+.env
+.env.local
+.env.*.local
+# currently don't want to checkin PNG files
+*.png
