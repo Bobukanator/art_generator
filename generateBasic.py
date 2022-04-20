@@ -36,29 +36,24 @@ def createRandomAngle():
     return random.randint(0, 360)
 
 
-def createRandomPoints(image, pointCount):
+def drawRandomPoints(image, pointCount):
     draw = ImageDraw.Draw(image)
     pt_color = main_color
 
     for _ in range(pointCount):
-        randomPoint = (
-            random.randint(0+draw_padding, max_px_canvas-draw_padding),
-            random.randint(0+draw_padding, max_px_canvas-draw_padding)
-        )
-        draw.point(randomPoint, fill=createRandomColor())
+        draw.point(createRandomPoint(), fill=createRandomColor())
 
 
-def createRandomFlowerWithColor(image, locationPt, petalCount, color):
+def createRandomChordWithColor(image, locationPt, color):
     draw = ImageDraw.Draw(image)
+    draw.chord((locationPt, createRandomPoint()), createRandomAngle(), createRandomAngle(),
+               fill=color, outline=(0, 0, 0), width=1)
 
-    for _ in range(petalCount):
-        random_lineend = (
-            random.randint(0+draw_padding, max_px_canvas-draw_padding),
-            random.randint(0+draw_padding, max_px_canvas-draw_padding)
-        )
 
-        draw.chord((locationPt, random_lineend), createRandomAngle(), createRandomAngle(),
-                   fill=color, outline=(0, 0, 0), width=1)
+def createRandomPiesliceWithColor(image, locationPt, color):
+    draw = ImageDraw.Draw(image)
+    draw.pieslice((locationPt, createRandomPoint()), createRandomAngle(), createRandomAngle(),
+                  fill=color, outline=(0, 0, 0), width=1)
 
 
 def createRandomLines(image, lineCount):
@@ -75,17 +70,22 @@ def createRandomLines(image, lineCount):
         )
 
         line_xy = (random_linestart, random_lineend)
-        line_color = (0, 0, 0)
-        draw.line(line_xy, fill=line_color)
+        draw.line(line_xy, fill=createRandomColor())
 
 
 def generateBasic():
 
     image = createBlankCanvas()
-    createRandomPoints(image, 400)
-    for _ in range(10):
-        createRandomFlowerWithColor(
-            image, createRandomPoint(), 5, createRandomColor())
+
+    createRandomLines(image, random.randint(0, 40))
+
+    for _ in range(random.randint(0, 40)):
+        createRandomChordWithColor(
+            image, createRandomPoint(), createRandomColor())
+    for _ in range(random.randint(0, 40)):
+        createRandomPiesliceWithColor(
+            image, createRandomPoint(), createRandomColor())
+
     image.save(directory+imagename)
 
 
