@@ -6,3 +6,13 @@ This is the initial version - I plan on experimenting more with the ImageDraw mo
 
 Stay tuned!
 
+#dependencies
+Make sure to install these modules using pip before running
+
+pandas
+numpy
+tensorflow
+opencv-python
+matplotlib
+
+

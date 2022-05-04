@@ -7,7 +7,6 @@ max_px_canvas = 128
 canvas_size = (max_px_canvas, max_px_canvas)
 draw_padding = 15
 background_color = (255, 255, 255)
-imagename = "TestImage.png"
 directory = "art_generator/images/"
 
 
@@ -71,7 +70,7 @@ def DrawARandomTechnique(image, color):
                          createRandomPoint()), fill=color, outline=(0, 0, 0), width=1)
 
 
-def generateBasic():
+def generateBasic(imagename):
 
     image = createBlankCanvas()
     for _ in range(random.randint(0, 100)):
@@ -81,4 +80,8 @@ def generateBasic():
 
 
 if __name__ == "__main__":
-    generateBasic()
+    print("This program generates random images.. starting now!")
+    for i in range(100):
+        imagename = "genImage"+str(i+1)+".png"
+        generateBasic(imagename)
+        print(imagename + " generated.")
