@@ -15,4 +15,9 @@ tensorflow
 opencv-python
 matplotlib
 
+Highly recommend you install CUDA 11.2 & cuDNN 8.1 (NOTE IT MUST BE THE EXACT VERSION) to utilize your GPU 
+for training if you so desire. Tensorflow training on a CPU is MUCH slower than GPU. 
+https://www.tensorflow.org/install/gpu
+
+
 
