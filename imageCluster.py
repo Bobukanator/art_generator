@@ -151,6 +151,10 @@ def readyCIFAR10():
     scores = model.evaluate(X_test, y_test, verbose=0)
     print("Accuracy: %.2f%%" % (scores[1]*100))
 
+    # plot the learning curve
+    pd.DataFrame(history.history).plot()
+    plt.show()
+
 
 if __name__ == "__main__":
     print("Starting program..")
