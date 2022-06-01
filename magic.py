@@ -22,6 +22,54 @@ IMG_WIDTH = 32
 IMG_HEIGHT = 32
 
 
+def interateImagesAndClassify(img_folder):
+
+    model = loadCIFarModel()
+
+    for file in os.listdir(os.path.join(img_folder)):
+        # loading one image at a time
+        image_path = os.path.join(img_folder, file)
+        theImage = image.load_img(
+            image_path, target_size=(IMG_HEIGHT, IMG_WIDTH))
+        theImageArray = image.img_to_array(theImage)
+        theImageArray = np.expand_dims(theImageArray, axis=0)
+        # check image and move it to new directory based on what the model thinks it looks like!
+        result = model.predict(theImageArray)
+        if result[0][0] == 1:
+            print("Aeroplane")
+            os.renames(image_path, img_folder+"/Aeroplane/"+file)
+        elif result[0][1] == 1:
+            print('Automobile')
+            os.renames(image_path, img_folder+"/Automobile/"+file)
+        elif result[0][2] == 1:
+            print('Bird')
+            os.renames(image_path, img_folder+"/Bird/"+file)
+        elif result[0][3] == 1:
+            print('Cat')
+            os.renames(image_path, img_folder+"/Cat/"+file)
+        elif result[0][4] == 1:
+            print('Deer')
+            os.renames(image_path, img_folder+"/Deer/"+file)
+        elif result[0][5] == 1:
+            print('Dog')
+            os.renames(image_path, img_folder+"/Dog/"+file)
+        elif result[0][6] == 1:
+            print('Frog')
+            os.renames(image_path, img_folder+"/Frog/"+file)
+        elif result[0][7] == 1:
+            print('Horse')
+            os.renames(image_path, img_folder+"/Horse/"+file)
+        elif result[0][8] == 1:
+            print('Ship')
+            os.renames(image_path, img_folder+"/Ship/"+file)
+        elif result[0][9] == 1:
+            print('Truck')
+            os.renames(image_path, img_folder+"/Truck/"+file)
+        else:
+            print('Error')
+            os.renames(image_path, img_folder+"/Error/"+file)
+
+
 def loadImagesToArray(img_folder):
 
     img_data_array = []
@@ -73,17 +121,16 @@ def loadCIFarModel():
     model = tf.keras.models.load_model(r'cifar10modeltrained')
     # Check its architecture
     model.summary()
-    (X_train, y_train), (X_test, y_test) = cifar10.load_data()
-    X_test = X_test.astype('float32')
-    X_test = X_test / 255.0
-    y_test = np_utils.to_categorical(y_test)
-    scores = model.evaluate(X_test, y_test, verbose=0)
-    print("Accuracy of loaded CIFAR model: %.2f%%" % (scores[1]*100))
+    #(X_train, y_train), (X_test, y_test) = cifar10.load_data()
+    #X_test = X_test.astype('float32')
+    #X_test = X_test / 255.0
+    #y_test = np_utils.to_categorical(y_test)
+    #scores = model.evaluate(X_test, y_test, verbose=0)
+    #print("Accuracy of loaded CIFAR model: %.2f%%" % (scores[1]*100))
     return model
 
 
-if __name__ == "__main__":
-    print("Starting Magic..")
+def oldmain():
     model = loadCIFarModel()
 
     img_folder = r'images'
@@ -114,3 +161,9 @@ if __name__ == "__main__":
             print('Truck')
         else:
             print('Error')
+
+
+if __name__ == "__main__":
+    print("Starting Magic..")
+    img_folder = r'images'
+    interateImagesAndClassify(img_folder)

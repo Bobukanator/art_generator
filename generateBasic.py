@@ -3,11 +3,13 @@ from enum import IntEnum
 import random
 
 # Global Variables
-max_px_canvas = 128
+max_px_canvas = 256
+number_of_generated_images = 1000
+
 canvas_size = (max_px_canvas, max_px_canvas)
 draw_padding = 15
 background_color = (255, 255, 255)
-directory = "art_generator/images/"
+directory = "images/"
 
 
 # INT Enum containing the different types of image.Draw techniques
@@ -81,7 +83,7 @@ def generateBasic(imagename):
 
 if __name__ == "__main__":
     print("This program generates random images.. starting now!")
-    for i in range(100):
+    for i in range(number_of_generated_images):
         imagename = "genImage"+str(i+1)+".png"
         generateBasic(imagename)
         print(imagename + " generated.")
