@@ -1,9 +1,7 @@
-# Python script that loads images into
-# an Image dataset for use with ML
-# Base code from Renu Khandelwal
+# Python script that loads the CIFAR-10 model, trains, and saves for use in this art generator project.
+# Base code from Renu Khandelwal:
 # https://towardsdatascience.com/loading-custom-image-dataset-for-deep-learning-models-part-1-d64fa7aaeca6
-# Will be using the built in CIFAR-10 dataset to help group our existing images into something that looks
-# human recognizable
+# additional input thanks to
 # https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/
 from keras.datasets import cifar10
 import matplotlib.image as mpimg
@@ -25,59 +23,11 @@ import ssl
 # required to download the CIFAR10 dataset, otherwise cert error will occur
 ssl._create_default_https_context = ssl._create_unverified_context
 
-
 IMG_WIDTH = 128
 IMG_HEIGHT = 128
 
 # Set random seed for purposes of reproducibility
 seed = 21
-
-
-def create_dataset(img_folder):
-
-    img_data_array = []
-    for file in os.listdir(os.path.join(img_folder)):
-
-        image_path = os.path.join(img_folder, file)
-        image = cv2.imread(image_path, cv2.COLOR_BGR2RGB)
-        image = cv2.resize(image, (IMG_HEIGHT, IMG_WIDTH),
-                           interpolation=cv2.INTER_AREA)
-        image = np.array(image)
-        image = image.astype('float32')
-        image /= 255
-        img_data_array.append(image)
-
-    return img_data_array
-
-
-def showRandomSampleOfRandomGeneratedImages(img_folder):
-    # plt.figure(figsize=(20, 20))
-    # Very Cool loading of random images -- save for future use
-    for i in range(5):
-        file = random.choice(os.listdir(img_folder))
-        image_path = os.path.join(img_folder, file)
-        img = mpimg.imread(image_path)
-        ax = plt.subplot(1, 5, i+1)
-        ax.title.set_text(file)
-        plt.imshow(img)
-    plt.show()
-
-
-def loadRandomImageDataSet():
-    # extract the image array and class name
-    img_data = create_dataset(img_folder)
-    model = tf.keras.Sequential(
-        [
-            tf.keras.layers.InputLayer(input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
-            tf.keras.layers.Conv2D(
-                filters=32, kernel_size=3, strides=(2, 2), activation='relu'),
-            tf.keras.layers.Conv2D(
-                filters=64, kernel_size=3, strides=(2, 2), activation='relu'),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(6)
-        ])
-    model(np.array(img_data, np.float32))
-    model.summary()
 
 
 def readyCIFAR10():
@@ -145,11 +95,14 @@ def readyCIFAR10():
     print("Training the network --->")
     np.random.seed(seed)
     history = model.fit(X_train, y_train, validation_data=(
-        X_test, y_test), epochs=25, batch_size=64)
+        X_test, y_test), epochs=40, batch_size=64)
 
     # Model evaluation
     scores = model.evaluate(X_test, y_test, verbose=0)
     print("Accuracy: %.2f%%" % (scores[1]*100))
+
+    # save model to file for loading later
+    model.save(r'/cifar10modeltrained')
 
     # plot the learning curve
     pd.DataFrame(history.history).plot()
@@ -157,9 +110,6 @@ def readyCIFAR10():
 
 
 if __name__ == "__main__":
-    print("Starting program..")
-
-    img_folder = r'art_generator/images'
-    # showRandomSampleOfRandomGeneratedImages(img_folder)
+    print("Starting loading and training program for CIFAR-10 dataset..")
 
     readyCIFAR10()
