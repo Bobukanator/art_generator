@@ -91,7 +91,7 @@ def ready_cifar10():
     print(F"Accuracy: % {round(scores[1]*100, 2)}")
 
     # save model to file for loading later
-    model.save(r'/cifar10modeltrained')
+    model.save(r'cifar10modeltrained')
 
     # plot the learning curve
     pd.DataFrame(history.history).plot()

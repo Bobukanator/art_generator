@@ -1,111 +1,59 @@
 # Loads trained model and examines images
-from keras.datasets import cifar10
-import matplotlib.image as mpimg
-from matplotlib import pyplot as plt
-from keras.utils import np_utils
-from keras.constraints import maxnorm
-from tensorflow.keras.models import Sequential, Model
-from keras.layers.core import Dense, Flatten
-from tensorflow.keras.layers import InputLayer
-from tensorflow.keras import layers, Input
-from keras.preprocessing import image
-from tensorflow import keras
 import os
 import random
-import pandas as pd
+import time
+import concurrent.futures
 import numpy as np
+from matplotlib import pyplot as plt
+import matplotlib.image as mpimg
 import tensorflow as tf
-import cv2
-import ssl
+from keras.preprocessing import image
+import cifar10utils
+import artmaker
 
+# globals - CIFAR Image dataset is 32x32 so only need to load images for prediction at the same resolution
 IMG_WIDTH = 32
 IMG_HEIGHT = 32
 
 
-def interateImagesAndClassify(img_folder):
-
-    model = loadCIFarModel()
+def interate_images_and_classify(img_folder):
+    """ load images from img_folder, classify using CIFAR-10 model, and save to corresponding directory """
 
     for file in os.listdir(os.path.join(img_folder)):
         # loading one image at a time
         image_path = os.path.join(img_folder, file)
-        theImage = image.load_img(
-            image_path, target_size=(IMG_HEIGHT, IMG_WIDTH))
-        theImageArray = image.img_to_array(theImage)
-        theImageArray = np.expand_dims(theImageArray, axis=0)
-        # check image and move it to new directory based on what the model thinks it looks like!
-        result = model.predict(theImageArray)
-        if result[0][0] == 1:
-            print("Aeroplane")
-            os.renames(image_path, img_folder+"/Aeroplane/"+file)
-        elif result[0][1] == 1:
-            print('Automobile')
-            os.renames(image_path, img_folder+"/Automobile/"+file)
-        elif result[0][2] == 1:
-            print('Bird')
-            os.renames(image_path, img_folder+"/Bird/"+file)
-        elif result[0][3] == 1:
-            print('Cat')
-            os.renames(image_path, img_folder+"/Cat/"+file)
-        elif result[0][4] == 1:
-            print('Deer')
-            os.renames(image_path, img_folder+"/Deer/"+file)
-        elif result[0][5] == 1:
-            print('Dog')
-            os.renames(image_path, img_folder+"/Dog/"+file)
-        elif result[0][6] == 1:
-            print('Frog')
-            os.renames(image_path, img_folder+"/Frog/"+file)
-        elif result[0][7] == 1:
-            print('Horse')
-            os.renames(image_path, img_folder+"/Horse/"+file)
-        elif result[0][8] == 1:
-            print('Ship')
-            os.renames(image_path, img_folder+"/Ship/"+file)
-        elif result[0][9] == 1:
-            print('Truck')
-            os.renames(image_path, img_folder+"/Truck/"+file)
-        else:
-            print('Error')
-            os.renames(image_path, img_folder+"/Error/"+file)
+        if ".png" in image_path:
+            the_image = image.load_img(
+                image_path, target_size=(IMG_HEIGHT, IMG_WIDTH))
+            the_image_as_array = image.img_to_array(the_image)
+            the_image_as_array = np.expand_dims(the_image_as_array, axis=0)
+            # check image and move it to new directory based on what the model thinks it looks like!
+            result = cifar10utils.human_readable_result(
+                model.predict(the_image_as_array))
+            print(result)
+            os.renames(image_path, img_folder+"/"+result+"/"+file)
 
 
-def loadImagesToArray(img_folder):
-
-    img_data_array = []
-    for file in os.listdir(os.path.join(img_folder)):
-
-        image_path = os.path.join(img_folder, file)
-        theImage = image.load_img(
-            image_path, target_size=(IMG_HEIGHT, IMG_WIDTH))
-        theImageArray = image.img_to_array(theImage)
-        theImageArray = np.expand_dims(theImageArray, axis=0)
-
-        img_data_array.append(theImageArray)
-
-    return img_data_array
-
-
-def loadRandomImageDataSet():
-    # extract the image array and class name
-    img_data = loadImagesToArray(img_folder)
-    model = tf.keras.Sequential(
-        [
-            tf.keras.layers.InputLayer(input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
-            tf.keras.layers.Conv2D(
-                filters=32, kernel_size=3, strides=(2, 2), activation='relu'),
-            tf.keras.layers.Conv2D(
-                filters=64, kernel_size=3, strides=(2, 2), activation='relu'),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(6)
-        ])
-    model(np.array(img_data, np.float32))
-    model.summary()
+def create_until_10class(target_class):
+    """randomly generate image, classify, and continue until we have 1 of each cifar10 class - warning this may never end :) """
+    print("Attempting to create random image that is classified as "+target_class)
+    result = ""
+    start = time.process_time()
+    while result != target_class:
+        the_image = artmaker.generate_image(100)
+        the_small_image = the_image.resize((32, 32))
+        the_image_as_array = image.img_to_array(the_small_image)
+        the_image_as_array = np.expand_dims(the_image_as_array, axis=0)
+        result = cifar10utils.human_readable_result(
+            MODEL.predict(the_image_as_array))
+        if result == target_class:
+            the_image.save("images/"+result+"Image.png")
+            print("Success! Image generated and saved as "+result+"Image.png")
+            print(f"Time elapsed: {(time.process_time()-start)} seconds")
 
 
-def showRandomSampleOfRandomGeneratedImages(img_folder):
-    # plt.figure(figsize=(20, 20))
-    # Very Cool loading of random images -- save for future use
+def show_random_sample_of_images(img_folder):
+    """Very Cool loading of random images -- save for future use"""
     for i in range(5):
         file = random.choice(os.listdir(img_folder))
         image_path = os.path.join(img_folder, file)
@@ -116,54 +64,31 @@ def showRandomSampleOfRandomGeneratedImages(img_folder):
     plt.show()
 
 
-def loadCIFarModel():
+def load_cifar_model():
+    """ loads saved cifar10 model"""
     print("Loading saved & trained CIFAR10 model...")
-    model = tf.keras.models.load_model(r'cifar10modeltrained')
+    global MODEL
+    MODEL = tf.keras.models.load_model(r'cifar10modeltrained')
     # Check its architecture
-    model.summary()
-    #(X_train, y_train), (X_test, y_test) = cifar10.load_data()
-    #X_test = X_test.astype('float32')
-    #X_test = X_test / 255.0
-    #y_test = np_utils.to_categorical(y_test)
-    #scores = model.evaluate(X_test, y_test, verbose=0)
-    #print("Accuracy of loaded CIFAR model: %.2f%%" % (scores[1]*100))
-    return model
-
-
-def oldmain():
-    model = loadCIFarModel()
-
-    img_folder = r'images'
-    imageArray = loadImagesToArray(img_folder)
-    print("Image Loaded "+str(len(imageArray)))
-    for theImage in imageArray:
-        result = model.predict(theImage)
-        print(result)
-        if result[0][0] == 1:
-            print("Aeroplane")
-        elif result[0][1] == 1:
-            print('Automobile')
-        elif result[0][2] == 1:
-            print('Bird')
-        elif result[0][3] == 1:
-            print('Cat')
-        elif result[0][4] == 1:
-            print('Deer')
-        elif result[0][5] == 1:
-            print('Dog')
-        elif result[0][6] == 1:
-            print('Frog')
-        elif result[0][7] == 1:
-            print('Horse')
-        elif result[0][8] == 1:
-            print('Ship')
-        elif result[0][9] == 1:
-            print('Truck')
-        else:
-            print('Error')
+    MODEL.summary()
 
 
 if __name__ == "__main__":
     print("Starting Magic..")
-    img_folder = r'images'
-    interateImagesAndClassify(img_folder)
+    # interate_images_and_classify(r'images')
+    load_cifar_model()
+    time.sleep(10)
+
+    cifar10_types = [
+        cifar10utils.CiFar10Classes.AUTOMOBILE,
+        cifar10utils.CiFar10Classes.AIRPLANE,
+        cifar10utils.CiFar10Classes.CAT
+    ]
+
+    create_until_10class(cifar10utils.CiFar10Classes.CAT)
+    # with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+    #    executor.map(create_until_10class, cifar10_types)
+
+    print("Attempting to create random image that is classified as a Meat Popcyle")
+    time.sleep(2)
+    print("just kidding!.. ")
