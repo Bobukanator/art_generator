@@ -1,47 +1,36 @@
 # Python script that loads the CIFAR-10 model, trains, and saves for use in this art generator project.
 # Base code from Renu Khandelwal:
 # https://towardsdatascience.com/loading-custom-image-dataset-for-deep-learning-models-part-1-d64fa7aaeca6
-# additional input thanks to
+# Additional input thanks to
 # https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/
-from keras.datasets import cifar10
-import matplotlib.image as mpimg
-from matplotlib import pyplot as plt
-from keras.utils import np_utils
-from keras.constraints import maxnorm
-from tensorflow.keras.models import Sequential, Model
-from keras.layers.core import Dense, Flatten
-from tensorflow.keras.layers import InputLayer
-from tensorflow.keras import layers, Input
-from tensorflow import keras
-import os
-import random
+import ssl
 import pandas as pd
 import numpy as np
-import tensorflow as tf
-import cv2
-import ssl
+from matplotlib import pyplot as plt
+from tensorflow import keras
+from keras.datasets import cifar10
+from keras.utils import np_utils
+
 # required to download the CIFAR10 dataset, otherwise cert error will occur
 ssl._create_default_https_context = ssl._create_unverified_context
 
-IMG_WIDTH = 128
-IMG_HEIGHT = 128
-
 # Set random seed for purposes of reproducibility
-seed = 21
+SEED = 21
 
 
-def readyCIFAR10():
+def ready_cifar10():
+    """load CIFAR-10 dataset - 60K 32x32 color images in 10 classes"""
     # load in cifar10 data
     # Loading in the data
     print("Loading CIFAR10 dataset - this will take a while.. ")
-    (X_train, y_train), (X_test, y_test) = cifar10.load_data()
+    (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 
     print("CIFAR10 dataset loaded..")
     # Normalize the inputs from 0-255 to between 0 and 1 by dividing by 255
-    X_train = X_train.astype('float32')
-    X_test = X_test.astype('float32')
-    X_train = X_train / 255.0
-    X_test = X_test / 255.0
+    x_train = x_train.astype('float32')
+    x_test = x_test.astype('float32')
+    x_train = x_train / 255.0
+    x_test = x_test / 255.0
 
     # One-hot encode outputs
     y_train = np_utils.to_categorical(y_train)
@@ -50,7 +39,7 @@ def readyCIFAR10():
 
     model = keras.Sequential()
     model.add(keras.layers.Conv2D(
-        32, (3, 3), input_shape=X_train.shape[1:], padding='same'))
+        32, (3, 3), input_shape=x_train.shape[1:], padding='same'))
     model.add(keras.layers.Activation('relu'))
     model.add(keras.layers.Conv2D(32, 3, input_shape=(
         32, 32, 3), activation='relu', padding='same'))
@@ -93,13 +82,13 @@ def readyCIFAR10():
 
     # train the network time and save that history
     print("Training the network --->")
-    np.random.seed(seed)
-    history = model.fit(X_train, y_train, validation_data=(
-        X_test, y_test), epochs=40, batch_size=64)
+    np.random.seed(SEED)
+    history = model.fit(x_train, y_train, validation_data=(
+        x_test, y_test), epochs=50, batch_size=64)
 
     # Model evaluation
-    scores = model.evaluate(X_test, y_test, verbose=0)
-    print("Accuracy: %.2f%%" % (scores[1]*100))
+    scores = model.evaluate(x_test, y_test, verbose=0)
+    print(F"Accuracy: % {round(scores[1]*100, 2)}")
 
     # save model to file for loading later
     model.save(r'/cifar10modeltrained')
@@ -111,5 +100,4 @@ def readyCIFAR10():
 
 if __name__ == "__main__":
     print("Starting loading and training program for CIFAR-10 dataset..")
-
-    readyCIFAR10()
+    ready_cifar10()
