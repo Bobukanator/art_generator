@@ -1,5 +1,5 @@
 # ART GENERATOR FUN
-Fun NFT phython ART generator inspired by Pixegami's 
+Fun NFT Python art generator inspired by Pixegami's 
 "How to create NFT generative art using Python"
   https://youtu.be/BMq2Jrvp9AA
 
@@ -11,13 +11,13 @@ Utility module to provide helpful functions when dealing with the CIFAR-10 datas
 ## generateBasic.py
 Utilizes the artmaker module to randomly create images. Currently using the default variables found in artmaker - 100 512x512 random color images saved to images directory
 ## loadTrainCIFAR10.py
-Program that loads the CIFAR-10 model, trains, and saves for use in this art generator project. Currently trains 50 epochs, this can be modified. 
+Program that loads the CIFAR-10 model, trains, and saves for use in this art generator project. Currently trains 50 epochs which appears to be sufficient for this dataset. 
 https://www.cs.toronto.edu/~kriz/cifar.html
 If you don't want to run this, you do not need to as a saved trained model (50 epochs!) is saved in this repository with accuracy of 84.64%
 ## magic.py
 There are two important functions in magic: 
 ### create_until_target_generated
-This uses the artmaker to randomly generate images, classify the images, and repeat until an image that is classified as the target is found. magic.py main spawns ten separate threads each with a cifar 10 type. Currently haven't been able to generate some of the cifar 10 types. Work in progress!
+This uses the artmaker to randomly generate images, classify the images, and repeat until an image that is classified as the target is found. magic.py main spawns ten separate threads each with a cifar 10 type. Currently I haven't been able to generate some of the cifar 10 types like frog or dog. It is a work in progress, I will need to continue to tweak the art generator. 
 ### interate_images_and_classify
 This can be used if you want to load all images in a directory, the method will load images, classify and resave using OS.renames to a new directory named after the classification. 
 

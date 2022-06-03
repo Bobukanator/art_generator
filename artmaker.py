@@ -1,9 +1,7 @@
 # Module to randomly create cool images
 # Brian Lawrence
 # June 2022
-from audioop import mul
 import random
-import math
 from enum import IntEnum
 from PIL import Image, ImageDraw
 
