@@ -8,6 +8,7 @@ from cv2 import blur
 
 # Global Variables
 MAX_PX_CANVAS = 512  # default
+MAX_SIZE_SHAPE = 100  # used to determine how big a shape is
 
 CANVAS_SIZE = (MAX_PX_CANVAS, MAX_PX_CANVAS)
 DRAW_PADDING = 15
@@ -79,24 +80,30 @@ def draw_random_shapes(image, color):
     draw = ImageDraw.Draw(image)
     random_technique = random.randint(1, len(DrawingShapeTechniques))
 
+    initial_random_point = create_random_point()
+    second_random_point = add_points_together(
+        initial_random_point, (random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE), random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)))
+    third_random_point = add_points_together(
+        initial_random_point, (random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE), random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)))
+
     match random_technique:
         case DrawingShapeTechniques.LINE:
-            draw.line((create_random_point(), create_random_point()), fill=color)
+            draw.line((initial_random_point, second_random_point), fill=color)
         case DrawingShapeTechniques.CHORD:
-            draw.chord((create_random_point(), create_random_point()), create_random_angle(), create_random_angle(),
+            draw.chord((initial_random_point, second_random_point), create_random_angle(), create_random_angle(),
                        fill=color, outline=(0, 0, 0), width=1)
         case DrawingShapeTechniques.PIESLICE:
-            draw.pieslice((create_random_point(), create_random_point()), create_random_angle(), create_random_angle(),
+            draw.pieslice((initial_random_point, second_random_point), create_random_angle(), create_random_angle(),
                           fill=color, outline=(0, 0, 0), width=1)
         case DrawingShapeTechniques.ELLIPSE:
             draw.ellipse(
-                (create_random_point(), create_random_point()), fill=color, outline=(0, 0, 0), width=1)
+                (initial_random_point, second_random_point), fill=color, outline=(0, 0, 0), width=1)
         case DrawingShapeTechniques.RECTANGLE:
             draw.rectangle(
-                (create_random_point(), create_random_point()), fill=color, outline=(0, 0, 0), width=1)
+                (initial_random_point, second_random_point), fill=color, outline=(0, 0, 0), width=1)
         case DrawingShapeTechniques.POLYGON:
-            draw.polygon((create_random_point(), create_random_point(),
-                         create_random_point()), fill=color, outline=(0, 0, 0), width=1)
+            draw.polygon((initial_random_point, second_random_point,
+                         third_random_point), fill=color, outline=(0, 0, 0), width=1)
         case DrawingShapeTechniques.CONNECTEDLINES:
             draw_random_connected_lines(draw, color)
 
@@ -179,7 +186,7 @@ def add_points_together(point1, point2):
 def draw_random_connected_lines(draw, color):
     """draw random connected lines"""
     point = create_random_point()
-    for _ in range(random.randint(0, 50)):
+    for _ in range(random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)):
         endpoint = create_random_point()
         draw.line((point, endpoint), fill=color)
         point = endpoint

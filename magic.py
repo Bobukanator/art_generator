@@ -15,7 +15,7 @@ import artmaker
 # globals - CIFAR Image dataset is 32x32 so only need to load images for prediction at the same resolution
 IMG_WIDTH = 32
 IMG_HEIGHT = 32
-IMAGE_DRAW_OPERATIONS = 125
+IMAGE_DRAW_OPERATIONS = 200
 DATED_IMAGE_FOLDER = dt.now().strftime("%A %m %Y")
 
 
@@ -43,8 +43,7 @@ def create_until_target_generated(target_class):
     result = ""
     start = time.process_time()
     while result != target_class:
-        the_pre_image = artmaker.generate_image(IMAGE_DRAW_OPERATIONS)
-        the_image = artmaker.apply_random_filter(the_pre_image)
+        the_image = artmaker.generate_image(IMAGE_DRAW_OPERATIONS)
         the_small_image = the_image.resize((32, 32))
         the_image_as_array = image.img_to_array(the_small_image)
         the_image_as_array = np.expand_dims(the_image_as_array, axis=0)
@@ -53,8 +52,17 @@ def create_until_target_generated(target_class):
         if result == target_class:
             the_image.save(
                 "images/"+DATED_IMAGE_FOLDER+"/"+result+"Image.png")
-            print("Success! Image generated and saved as "+result +
-                  "Image.png in folder: images/"+DATED_IMAGE_FOLDER)
+            the_imagef1 = artmaker.apply_random_filter(the_image)
+            the_imagef1.save(
+                "images/"+DATED_IMAGE_FOLDER+"/"+result+"Imagef1.png")
+            the_imagef2 = artmaker.apply_random_filter(the_image)
+            the_imagef2.save(
+                "images/"+DATED_IMAGE_FOLDER+"/"+result+"Imagef2.png")
+            the_imagef3 = artmaker.apply_random_filter(the_image)
+            the_imagef3.save(
+                "images/"+DATED_IMAGE_FOLDER+"/"+result+"Imagef3.png")
+            print("Success! Images generated and saved as "+result +
+                  "Image[f1-f3].png in folder: images/"+DATED_IMAGE_FOLDER)
             print(f"Time elapsed: {(time.process_time()-start)} seconds")
 
 
