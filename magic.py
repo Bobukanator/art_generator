@@ -2,6 +2,7 @@
 import os
 import random
 import time
+from datetime import datetime as dt
 import concurrent.futures
 import numpy as np
 from matplotlib import pyplot as plt
@@ -14,7 +15,8 @@ import artmaker
 # globals - CIFAR Image dataset is 32x32 so only need to load images for prediction at the same resolution
 IMG_WIDTH = 32
 IMG_HEIGHT = 32
-IMAGE_DRAW_OPERATIONS = 250
+IMAGE_DRAW_OPERATIONS = 125
+DATED_IMAGE_FOLDER = dt.now().strftime("%A %m %Y")
 
 
 def interate_images_and_classify(img_folder):
@@ -41,15 +43,18 @@ def create_until_target_generated(target_class):
     result = ""
     start = time.process_time()
     while result != target_class:
-        the_image = artmaker.generate_image(IMAGE_DRAW_OPERATIONS)
+        the_pre_image = artmaker.generate_image(IMAGE_DRAW_OPERATIONS)
+        the_image = artmaker.apply_random_filter(the_pre_image)
         the_small_image = the_image.resize((32, 32))
         the_image_as_array = image.img_to_array(the_small_image)
         the_image_as_array = np.expand_dims(the_image_as_array, axis=0)
         result = cifar10utils.human_readable_result(
             MODEL.predict(the_image_as_array))
         if result == target_class:
-            the_image.save("images/"+result+"Image.png")
-            print("Success! Image generated and saved as "+result+"Image.png")
+            the_image.save(
+                "images/"+DATED_IMAGE_FOLDER+"/"+result+"Image.png")
+            print("Success! Image generated and saved as "+result +
+                  "Image.png in folder: images/"+DATED_IMAGE_FOLDER)
             print(f"Time elapsed: {(time.process_time()-start)} seconds")
 
 
@@ -75,6 +80,11 @@ def load_cifar_model():
 
 
 if __name__ == "__main__":
+
+    # create new folder to store images
+    os.mkdir("images/"+DATED_IMAGE_FOLDER)
+    print("Creating folder: images/"+DATED_IMAGE_FOLDER)
+
     print("Starting Magic..")
     # interate_images_and_classify(r'images')
     load_cifar_model()
