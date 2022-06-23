@@ -1,10 +1,9 @@
-# Module to randomly create cool images
-# Brian Lawrence
-# June 2022
+""" Module to randomly create cool images
+    Brian Lawrence
+    June 2022 """
 import random
 from enum import IntEnum
 from PIL import Image, ImageDraw, ImageFilter
-from cv2 import blur
 
 # Global Variables
 MAX_PX_CANVAS = 512  # default

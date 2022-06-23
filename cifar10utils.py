@@ -1,7 +1,11 @@
-# utility module for the CIFAR-10 dataset
-# Brian Lawrence
+"""utility module for the CIFAR-10 dataset
+   Brian Lawrence"""
+
+import numpy as np
+
 
 class CiFar10Classes:
+    """Class of the 10 classes of CIFAR-10"""
     AIRPLANE = "Airplane"
     AUTOMOBILE = "Automobile"
     BIRD = "Bird"
@@ -12,6 +16,34 @@ class CiFar10Classes:
     HORSE = "Horse"
     SHIP = "Ship"
     TRUCK = "Truck"
+
+
+class CiFarClassTracker:
+    """ Thread safe way to track if we have generated all the cifar10 classes
+     - optimize the creation!"""
+
+    def __init__(self):
+        # define a 2d array containing the classtype and boolean value
+        self.data = np.array([class_type_values_in_array(), [False]*10])
+
+    # method on the class
+    def state(self):
+        """the current state of this class tracker"""
+        print(self.data)
+        print(self.found_all())
+
+    def found_all(self):
+        """returns true if all class types have been found (by using addClass)"""
+        for i in range(len(self.data[0])):
+            if self.data[1][i] == "False":
+                return False
+        return True
+
+    def add_class(self, class_name):
+        """passes the name of a class and if found, makes corresponding boolean value true"""
+        for i in range(len(self.data[0])):
+            if self.data[0][i] == class_name:
+                self.data[1][i] = True
 
 
 def class_type_values_in_array():

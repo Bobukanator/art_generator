@@ -1,4 +1,4 @@
-# Loads trained model and examines images
+"""Loads trained model and examines images"""
 import os
 import random
 import time
@@ -32,7 +32,7 @@ def interate_images_and_classify(img_folder):
             the_image_as_array = np.expand_dims(the_image_as_array, axis=0)
             # check image and move it to new directory based on what the model thinks it looks like!
             result = cifar10utils.human_readable_result(
-                model.predict(the_image_as_array))
+                MODEL.predict(the_image_as_array))
             print(result)
             os.renames(image_path, img_folder+"/"+result+"/"+file)
 
