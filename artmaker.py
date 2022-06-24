@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFilter
 
 # Global Variables
 MAX_PX_CANVAS = 512  # default
-MAX_SIZE_SHAPE = 100  # used to determine how big a shape is
+MAX_SIZE_SHAPE = 200  # used to determine how big a shape is
 
 CANVAS_SIZE = (MAX_PX_CANVAS, MAX_PX_CANVAS)
 DRAW_PADDING = 15

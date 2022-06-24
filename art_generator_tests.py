@@ -30,6 +30,13 @@ class TestCiFar10(unittest.TestCase):
         tracker.state()
         self.assertTrue(tracker.found_all())
 
+    def test_addclass_truefalse(self):
+        tracker = cifar10utils.CiFarClassTracker()
+        self.assertTrue(tracker.add_class(
+            cifar10utils.CiFar10Classes.AIRPLANE))
+        self.assertFalse(tracker.add_class(
+            cifar10utils.CiFar10Classes.AIRPLANE))
+
 
 if __name__ == '__main__':
     unittest.main()

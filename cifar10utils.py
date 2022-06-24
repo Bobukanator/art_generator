@@ -40,10 +40,13 @@ class CiFarClassTracker:
         return True
 
     def add_class(self, class_name):
-        """passes the name of a class and if found, makes corresponding boolean value true"""
+        """passes the name of a class and if found, makes corresponding boolean value true & returns value"""
         for i in range(len(self.data[0])):
             if self.data[0][i] == class_name:
-                self.data[1][i] = True
+                if self.data[1][i] != "True":
+                    self.data[1][i] = True
+                    return True
+        return False
 
 
 def class_type_values_in_array():
