@@ -2,12 +2,13 @@
     Brian Lawrence
     June 2022 """
 import random
+import math
 from enum import IntEnum
 from PIL import Image, ImageDraw, ImageFilter
 
 # Global Variables
 MAX_PX_CANVAS = 512  # default
-MAX_SIZE_SHAPE = 200  # used to determine how big a shape is
+MAX_SIZE_SHAPE = 250  # used to determine how big a shape is
 
 CANVAS_SIZE = (MAX_PX_CANVAS, MAX_PX_CANVAS)
 DRAW_PADDING = 15
@@ -30,6 +31,7 @@ class DrawingSquiggleTechniques(IntEnum):
     SQUIGGLES = 1
     BIGSQUIGGLES = 2
     SMALLSQUIGGLES = 3
+    DIRECTIONALSQUIGS = 4
 
 
 class PILImageFilters(IntEnum):
@@ -54,11 +56,11 @@ def create_blank_canvas():
 
 def create_random_color():
     """returns random RGB color"""
-    R = random.randint(0, 255)
-    G = random.randint(0, 255)
-    B = random.randint(0, 255)
+    red = random.randint(0, 255)
+    green = random.randint(0, 255)
+    blue = random.randint(0, 255)
 
-    return (R, G, B)
+    return (red, green, blue)
 
 
 def create_random_point():
@@ -81,18 +83,22 @@ def draw_random_shapes(image, color):
 
     initial_random_point = create_random_point()
     second_random_point = add_points_together(
-        initial_random_point, (random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE), random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)))
+        initial_random_point, (random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE),
+                               random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)))
     third_random_point = add_points_together(
-        initial_random_point, (random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE), random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)))
+        initial_random_point, (random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE),
+                               random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)))
 
     match random_technique:
         case DrawingShapeTechniques.LINE:
             draw.line((initial_random_point, second_random_point), fill=color)
         case DrawingShapeTechniques.CHORD:
-            draw.chord((initial_random_point, second_random_point), create_random_angle(), create_random_angle(),
+            draw.chord((initial_random_point, second_random_point),
+                       create_random_angle(), create_random_angle(),
                        fill=color, outline=(0, 0, 0), width=1)
         case DrawingShapeTechniques.PIESLICE:
-            draw.pieslice((initial_random_point, second_random_point), create_random_angle(), create_random_angle(),
+            draw.pieslice((initial_random_point, second_random_point),
+                          create_random_angle(), create_random_angle(),
                           fill=color, outline=(0, 0, 0), width=1)
         case DrawingShapeTechniques.ELLIPSE:
             draw.ellipse(
@@ -119,6 +125,8 @@ def draw_random_squiggles(image, color):
             draw_random_bigsquiggle(draw, color)
         case DrawingSquiggleTechniques.SMALLSQUIGGLES:
             draw_random_smallsquiggles(draw, color)
+        case DrawingSquiggleTechniques.DIRECTIONALSQUIGS:
+            draw_random_directionsquig(draw, color)
 
 
 def draw_random_smallsquiggles(draw, color):
@@ -146,6 +154,20 @@ def draw_random_bigsquiggle(draw, color):
         draw.point(point, fill=color)
         point = add_points_together(
             point, (random.randint(-10, 10), random.randint(-10, 10)))
+
+
+def draw_random_directionsquig(draw, color):
+    """Uses points to create some big squiggles - takes in draw,color as"""
+    point = create_random_point()  # starting point
+    angle = create_random_angle()
+
+    for _ in range(random.randint(0, 5000)):
+        angle += random.randint(-1, 1)  # random angle
+        for _ in range(random.randint(0, 5)):
+            draw.point(point, fill=color)
+            point = add_points_together(
+                point, (random.randint(0, 3) * math.cos(angle),
+                        random.randint(0, 3) * math.sin(angle)))
 
 
 def apply_random_filter(image):
@@ -185,8 +207,11 @@ def add_points_together(point1, point2):
 def draw_random_connected_lines(draw, color):
     """draw random connected lines"""
     point = create_random_point()
-    for _ in range(random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)):
-        endpoint = create_random_point()
+    endpoint = point
+    for _ in range(random.randint(0, 10)):
+        endpoint = add_points_together(
+            endpoint, (random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE),
+                       random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)))
         draw.line((point, endpoint), fill=color)
         point = endpoint
 
@@ -194,8 +219,18 @@ def draw_random_connected_lines(draw, color):
 def generate_image(maxoperations):
     """generate image and return - creating background first, followed by foreground """
     image = create_blank_canvas()
-    for _ in range(random.randint(0, maxoperations*2)):
-        draw_random_squiggles(image, create_random_color())
-    for _ in range(random.randint(0, maxoperations)):
-        draw_random_shapes(image, create_random_color())
+
+    somethingwasdrawn = False
+
+    while not somethingwasdrawn:
+        if bool(random.getrandbits(1)):
+            for _ in range(random.randint(0, maxoperations)):
+                draw_random_squiggles(image, create_random_color())
+            somethingwasdrawn = True
+
+        if bool(random.getrandbits(1)):
+            for _ in range(random.randint(0, maxoperations)):
+                draw_random_shapes(image, create_random_color())
+            somethingwasdrawn = True
+
     return image

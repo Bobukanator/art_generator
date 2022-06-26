@@ -3,6 +3,7 @@ import os
 import random
 import time
 from datetime import datetime as dt
+from threading import Thread
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
@@ -11,15 +12,18 @@ from keras.preprocessing import image
 import cifar10utils
 import artmaker
 
-# globals - CIFAR Image dataset is 32x32 so only need to load images for prediction at the same resolution
+# globals - CIFAR Image dataset is 32x32 so only need to load images
+# for prediction at the same resolution
 IMG_WIDTH = 32
 IMG_HEIGHT = 32
-IMAGE_DRAW_OPERATIONS = 237
+IMAGE_DRAW_OPERATIONS = 105
 DATED_IMAGE_FOLDER = dt.now().strftime("%A %m %Y")
+MODEL = tf.keras.models.load_model(r'cifar10modeltrained')
 
 
 def interate_images_and_classify(img_folder):
-    """ load images from img_folder, classify using CIFAR-10 model, and save to corresponding directory """
+    """ load images from img_folder, classify using CIFAR-10 model,
+    and save to corresponding directory """
 
     for file in os.listdir(os.path.join(img_folder)):
         # loading one image at a time
@@ -36,9 +40,10 @@ def interate_images_and_classify(img_folder):
             os.renames(image_path, img_folder+"/"+result+"/"+file)
 
 
-def create_until_target_generated(tracker):
-    """randomly generate image, classify, and continue until we have 1 of each cifar10 class - warning this may never end :) """
-    print("Thread Spawned to create some images!")
+def create_until_target_generated(tracker, thread_id):
+    """randomly generate image, classify, and continue until we have 1 of each cifar10 class
+    warning this may never end :) """
+    print("Create until target with id:"+str(thread_id)+" started!")
     result = ""
     start = time.process_time()
     while not tracker.found_all():
@@ -60,7 +65,7 @@ def create_until_target_generated(tracker):
             the_imagef3 = artmaker.apply_random_filter(the_image)
             the_imagef3.save(
                 "images/"+DATED_IMAGE_FOLDER+"/"+result+"Imagef3.png")
-            print("Success! Images generated and saved as "+result +
+            print("Success in id:" + str(thread_id) + " Images generated and saved as "+result +
                   "Image[f1-f3].png in folder: images/"+DATED_IMAGE_FOLDER)
             print(f"Time elapsed: {(time.process_time()-start)} seconds")
             tracker.state()
@@ -72,8 +77,8 @@ def show_random_sample_of_images(img_folder):
         file = random.choice(os.listdir(img_folder))
         image_path = os.path.join(img_folder, file)
         img = mpimg.imread(image_path)
-        ax = plt.subplot(1, 5, i+1)
-        ax.title.set_text(file)
+        a_x = plt.subplot(1, 5, i+1)
+        a_x.title.set_text(file)
         plt.imshow(img)
     plt.show()
 
@@ -81,8 +86,6 @@ def show_random_sample_of_images(img_folder):
 def load_cifar_model():
     """ loads saved cifar10 model"""
     print("Loading saved & trained CIFAR10 model...")
-    global MODEL
-    MODEL = tf.keras.models.load_model(r'cifar10modeltrained')
     # Check its architecture
     MODEL.summary()
 
@@ -98,8 +101,17 @@ if __name__ == "__main__":
     load_cifar_model()
     time.sleep(10)
 
-    tracker = cifar10utils.CiFarClassTracker()
-    create_until_target_generated(tracker)
+    cifar_tracker = cifar10utils.CiFarClassTracker()
+
+    threads = []
+    for n in range(1, 11):
+        t = Thread(target=create_until_target_generated,
+                   args=(cifar_tracker, n,))
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
 
     print("Attempting to create random image that is classified as a Meat Popcyle")
     time.sleep(2)

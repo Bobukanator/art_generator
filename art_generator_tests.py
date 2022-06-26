@@ -1,6 +1,8 @@
 """UNIT TESTING IS THE BEST!"""
 import unittest
 import cifar10utils
+import artmaker
+from PIL import Image, ImageDraw
 
 
 class TestCiFar10(unittest.TestCase):
@@ -36,6 +38,17 @@ class TestCiFar10(unittest.TestCase):
             cifar10utils.CiFar10Classes.AIRPLANE))
         self.assertFalse(tracker.add_class(
             cifar10utils.CiFar10Classes.AIRPLANE))
+
+
+class TestArtMaker(unittest.TestCase):
+
+    def test_randomdirectionalsquig(self):
+        testimage = artmaker.create_blank_canvas()
+        draw = ImageDraw.Draw(testimage)
+        artmaker.draw_random_directionsquig(
+            draw, artmaker.create_random_color())
+        self.assertIsNotNone(testimage)
+        testimage.save("images/squiqtest.png")
 
 
 if __name__ == '__main__':
