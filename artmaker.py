@@ -233,4 +233,9 @@ def generate_image(maxoperations):
                 draw_random_shapes(image, create_random_color())
             somethingwasdrawn = True
 
+        if not somethingwasdrawn:
+            for _ in range(random.randint(0, maxoperations*10)):
+                draw_random_squiggles(image, create_random_color())
+            somethingwasdrawn = True
+
     return image

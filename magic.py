@@ -17,7 +17,7 @@ import artmaker
 IMG_WIDTH = 32
 IMG_HEIGHT = 32
 IMAGE_DRAW_OPERATIONS = 105
-DATED_IMAGE_FOLDER = dt.now().strftime("%A %m %Y")
+DATED_IMAGE_FOLDER = dt.now().strftime("%m_%d_%Y")
 MODEL = tf.keras.models.load_model(r'cifar10modeltrained')
 
 
