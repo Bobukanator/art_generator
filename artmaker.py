@@ -18,12 +18,12 @@ BACKGROUND_COLOR = (255, 255, 255)
 class DrawingShapeTechniques(IntEnum):
     """ INT Enum containing the different types of image.Draw techniques"""
     LINE = 1
-    CHORD = 2
-    PIESLICE = 3
-    ELLIPSE = 4
-    RECTANGLE = 5
-    POLYGON = 6
-    CONNECTEDLINES = 7
+    CONNECTEDLINES = 2
+    RECTANGLE = 3
+    POLYGON = 4
+    CHORD = 5
+    PIESLICE = 6
+    ELLIPSE = 7
 
 
 class DrawingSquiggleTechniques(IntEnum):
@@ -77,9 +77,14 @@ def create_random_angle():
 
 
 def draw_random_shapes(image, color):
-    """Creates a random background"""
-    draw = ImageDraw.Draw(image)
+    """Creates a random drawing - no preference - all techniques have equal probability"""
     random_technique = random.randint(1, len(DrawingShapeTechniques))
+    draw_shapes_by_type(image, color, random_technique)
+
+
+def draw_shapes_by_type(image, color, drawing_shape_type):
+    """Creates a drawing of type DrawingShapeTechniques """
+    draw = ImageDraw.Draw(image)
 
     initial_random_point = create_random_point()
     second_random_point = add_points_together(
@@ -89,7 +94,7 @@ def draw_random_shapes(image, color):
         initial_random_point, (random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE),
                                random.randint(-MAX_SIZE_SHAPE, MAX_SIZE_SHAPE)))
 
-    match random_technique:
+    match drawing_shape_type:
         case DrawingShapeTechniques.LINE:
             draw.line((initial_random_point, second_random_point), fill=color)
         case DrawingShapeTechniques.CHORD:
@@ -132,7 +137,7 @@ def draw_random_squiggles(image, color):
 def draw_random_smallsquiggles(draw, color):
     """Uses points to create some squiggles - takes in draw,color"""
     point = create_random_point()
-    for _ in range(random.randint(0, 500)):
+    for _ in range(random.randint(0, 1500)):
         draw.point(point, fill=color)
         point = add_points_together(
             point, (random.randint(-1, 1), random.randint(-1, 1)))
@@ -150,10 +155,10 @@ def draw_random_regularsquiggles(draw, color):
 def draw_random_bigsquiggle(draw, color):
     """Uses points to create some big squiggles - takes in draw,color as"""
     point = create_random_point()
-    for _ in range(random.randint(0, 5000)):
+    for _ in range(random.randint(0, 2500)):
         draw.point(point, fill=color)
         point = add_points_together(
-            point, (random.randint(-10, 10), random.randint(-10, 10)))
+            point, (random.randint(-15, 15), random.randint(-10, 10)))
 
 
 def draw_random_directionsquig(draw, color):
@@ -216,26 +221,52 @@ def draw_random_connected_lines(draw, color):
         point = endpoint
 
 
+def draw_using_round_techniques(image):
+    """ draw using only round techniques
+    more suitable for drawings of organic things"""
+
+    color = create_random_color()
+    draw_random_squiggles(image, color)
+    random_technique = random.randint(5, 7)
+    draw_shapes_by_type(image, color, random_technique)
+
+
+def draw_using_hardedge_techniques(image):
+    """draw using hard edged techniques - good for
+    non-organic things"""
+    random_technique = random.randint(1, 4)
+    draw_shapes_by_type(image, create_random_color(), random_technique)
+
+
 def generate_image(maxoperations):
-    """generate image and return - creating background first, followed by foreground """
+    """this is the main image generation method """
     image = create_blank_canvas()
 
     somethingwasdrawn = False
+    random_technique = random.randint(1, 3)
 
-    while not somethingwasdrawn:
-        if bool(random.getrandbits(1)):
+    match random_technique:
+        case 1:
+            while not somethingwasdrawn:
+                if bool(random.getrandbits(1)):
+                    for _ in range(random.randint(0, maxoperations)):
+                        draw_random_squiggles(image, create_random_color())
+                    somethingwasdrawn = True
+
+                if bool(random.getrandbits(1)):
+                    for _ in range(random.randint(0, maxoperations)):
+                        draw_random_shapes(image, create_random_color())
+                    somethingwasdrawn = True
+
+                if not somethingwasdrawn:
+                    for _ in range(random.randint(0, maxoperations*5)):
+                        draw_random_squiggles(image, create_random_color())
+                    somethingwasdrawn = True
+        case 2:
             for _ in range(random.randint(0, maxoperations)):
-                draw_random_squiggles(image, create_random_color())
-            somethingwasdrawn = True
-
-        if bool(random.getrandbits(1)):
+                draw_using_round_techniques(image)
+        case 3:
             for _ in range(random.randint(0, maxoperations)):
-                draw_random_shapes(image, create_random_color())
-            somethingwasdrawn = True
-
-        if not somethingwasdrawn:
-            for _ in range(random.randint(0, maxoperations*10)):
-                draw_random_squiggles(image, create_random_color())
-            somethingwasdrawn = True
+                draw_using_hardedge_techniques(image)
 
     return image
