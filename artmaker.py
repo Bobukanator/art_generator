@@ -3,6 +3,7 @@
     June 2022 """
 import random
 import math
+import matplotlib.cm
 from enum import IntEnum
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -61,6 +62,20 @@ def create_random_color():
     blue = random.randint(0, 255)
 
     return (red, green, blue)
+
+
+def denormalize(colormap):
+    """Pillow accepts integers of 0 -> 255 for the color"""
+    return [
+        tuple(int(channel * 255) for channel in color)
+        for color in colormap
+    ]
+
+
+def create_random_color_incolormap(colormap):
+    """return random color within a specified colormap from matplotlib.cm"""
+    palette = denormalize(colormap)
+    return palette[random.randint(0, len(palette)-1)]
 
 
 def create_random_point():
@@ -221,21 +236,20 @@ def draw_random_connected_lines(draw, color):
         point = endpoint
 
 
-def draw_using_round_techniques(image):
+def draw_using_round_techniques(image, color):
     """ draw using only round techniques
     more suitable for drawings of organic things"""
 
-    color = create_random_color()
     draw_random_squiggles(image, color)
     random_technique = random.randint(5, 7)
     draw_shapes_by_type(image, color, random_technique)
 
 
-def draw_using_hardedge_techniques(image):
+def draw_using_hardedge_techniques(image, color):
     """draw using hard edged techniques - good for
     non-organic things"""
     random_technique = random.randint(1, 4)
-    draw_shapes_by_type(image, create_random_color(), random_technique)
+    draw_shapes_by_type(image, color, random_technique)
 
 
 def generate_image(maxoperations):
@@ -244,6 +258,8 @@ def generate_image(maxoperations):
 
     somethingwasdrawn = False
     random_technique = random.randint(1, 3)
+
+    colormap = matplotlib.cm.get_cmap("twilight").colors
 
     match random_technique:
         case 1:
@@ -264,9 +280,11 @@ def generate_image(maxoperations):
                     somethingwasdrawn = True
         case 2:
             for _ in range(random.randint(0, maxoperations)):
-                draw_using_round_techniques(image)
+                draw_using_round_techniques(
+                    image, create_random_color_incolormap(colormap))
         case 3:
             for _ in range(random.randint(0, maxoperations)):
-                draw_using_hardedge_techniques(image)
+                draw_using_hardedge_techniques(
+                    image, create_random_color_incolormap(colormap))
 
     return image
