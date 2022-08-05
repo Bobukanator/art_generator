@@ -2,7 +2,7 @@
 import unittest
 import cifar10utils
 import artmaker
-from PIL import Image, ImageDraw
+from PIL import ImageDraw
 
 
 class TestCiFar10(unittest.TestCase):
@@ -49,6 +49,15 @@ class TestArtMaker(unittest.TestCase):
             draw, artmaker.create_random_color())
         self.assertIsNotNone(testimage)
         testimage.save("images/squiqtest.png")
+
+    def test_gettingrandomcolormaps(self):
+
+        self.assertIsNotNone(artmaker.returnrandomcolormap())
+        self.assertIsNotNone(artmaker.returnrandomcolormap())
+        self.assertIsNotNone(artmaker.returnrandomcolormap())
+        self.assertIsNotNone(artmaker.returnrandomcolormap())
+        self.assertIsNotNone(artmaker.returnrandomcolormap())
+        self.assertIsNotNone(artmaker.returnrandomcolormap())
 
 
 if __name__ == '__main__':

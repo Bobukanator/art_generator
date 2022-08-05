@@ -12,23 +12,23 @@ Utility module to provide helpful functions when dealing with the CIFAR-10 datas
 Utilizes the artmaker module to randomly create images. Currently using the default variables found in artmaker - 100 512x512 random color images saved to images directory
 ## loadTrainCIFAR10.py
 Program that loads the CIFAR-10 model, trains, and saves for use in this art generator project. Currently trains 50 epochs which appears to be sufficient for this dataset. 
-https://www.cs.toronto.edu/~kriz/cifar.html
+https://www.cs.toronto.edu/~kriz/cifar.html 
 If you don't want to run this, you do not need to as a saved trained model (50 epochs!) is saved in this repository with accuracy of 84.64%
 ## magic.py
 There are two important functions in magic: 
 ### create_until_target_generated
-This uses the artmaker to randomly generate images, classify the images, and repeat until an image that is classified as the target is found. magic.py main spawns ten separate threads each with a cifar 10 type. Currently I haven't been able to generate some of the cifar 10 types like frog or dog. It is a work in progress, I will need to continue to tweak the art generator. 
+This uses the artmaker to randomly generate images, classify the images, and repeat until an image that is classified as the target is found. magic.py main spawns ten separate threads each with a cifar 10 type. Currently this will eventually generate (1 - 2 hours) all the cifar types EXCEPT for a FROG!!! I may end up writting a unique drawing technique that removes some randomness so I can have a drawing that is classified as a frog. :)
 ### interate_images_and_classify
 This can be used if you want to load all images in a directory, the method will load images, classify and resave using OS.renames to a new directory named after the classification. 
 
 # dependencies
 Make sure to install these modules using pip before running
 
-pandas
-numpy
-tensorflow
-opencv-python
-matplotlib
+  pandas
+  numpy
+  tensorflow
+  opencv-python
+  matplotlib
 
 Highly recommend you install CUDA 11.2 & cuDNN 8.1 (NOTE IT MUST BE THE EXACT VERSION) to utilize your GPU 
 for training if you so desire. Tensorflow training on a CPU is MUCH slower than GPU. 

@@ -3,8 +3,9 @@
     June 2022 """
 import random
 import math
-import matplotlib.cm
 from enum import IntEnum
+import numpy as np
+import matplotlib.cm
 from PIL import Image, ImageDraw, ImageFilter
 
 # Global Variables
@@ -252,6 +253,41 @@ def draw_using_hardedge_techniques(image, color):
     draw_shapes_by_type(image, color, random_technique)
 
 
+def returnrandomcolormap():
+    """returns a random colormap"""
+    random_map = random.randint(1, 10)
+
+    match random_map:
+        case 1:
+            return matplotlib.cm.get_cmap("twilight").colors
+        case 2:
+            return matplotlib.cm.get_cmap("viridis").colors
+        case 3:
+            cmap = matplotlib.cm.get_cmap("summer")
+            return cmap(np.arange(0, cmap.N))
+        case 4:
+            cmap = matplotlib.cm.get_cmap("spring")
+            return cmap(np.arange(0, cmap.N))
+        case 5:
+            cmap = matplotlib.cm.get_cmap("autumn")
+            return cmap(np.arange(0, cmap.N))
+        case 6:
+            cmap = matplotlib.cm.get_cmap("winter")
+            return cmap(np.arange(0, cmap.N))
+        case 7:
+            cmap = matplotlib.cm.get_cmap("ocean")
+            return cmap(np.arange(0, cmap.N))
+        case 8:
+            cmap = matplotlib.cm.get_cmap("terrain")
+            return cmap(np.arange(0, cmap.N))
+        case 9:
+            cmap = matplotlib.cm.get_cmap("nipy_spectral")
+            return cmap(np.arange(0, cmap.N))
+        case 10:
+            cmap = matplotlib.cm.get_cmap("rainbow")
+            return cmap(np.arange(0, cmap.N))
+
+
 def generate_image(maxoperations):
     """this is the main image generation method """
     image = create_blank_canvas()
@@ -259,24 +295,27 @@ def generate_image(maxoperations):
     somethingwasdrawn = False
     random_technique = random.randint(1, 3)
 
-    colormap = matplotlib.cm.get_cmap("twilight").colors
+    colormap = returnrandomcolormap()
 
     match random_technique:
         case 1:
             while not somethingwasdrawn:
                 if bool(random.getrandbits(1)):
                     for _ in range(random.randint(0, maxoperations)):
-                        draw_random_squiggles(image, create_random_color())
+                        draw_random_squiggles(
+                            image, create_random_color_incolormap(colormap))
                     somethingwasdrawn = True
 
                 if bool(random.getrandbits(1)):
                     for _ in range(random.randint(0, maxoperations)):
-                        draw_random_shapes(image, create_random_color())
+                        draw_random_shapes(
+                            image, create_random_color_incolormap(colormap))
                     somethingwasdrawn = True
 
                 if not somethingwasdrawn:
                     for _ in range(random.randint(0, maxoperations*5)):
-                        draw_random_squiggles(image, create_random_color())
+                        draw_random_squiggles(
+                            image, create_random_color_incolormap(colormap))
                     somethingwasdrawn = True
         case 2:
             for _ in range(random.randint(0, maxoperations)):
