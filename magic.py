@@ -54,20 +54,21 @@ def create_until_target_generated(tracker, thread_id):
         result = cifar10utils.human_readable_result(
             MODEL.predict(the_image_as_array))
         if tracker.add_class(result):
+            secondspast = time.process_time()-start
             the_image.save(
-                "images/"+DATED_IMAGE_FOLDER+"/"+result+"Image.png")
+                "images/"+DATED_IMAGE_FOLDER+"/"+result+str(secondspast)+"Image.png")
             the_imagef1 = artmaker.apply_random_filter(the_image)
             the_imagef1.save(
-                "images/"+DATED_IMAGE_FOLDER+"/"+result+"Imagef1.png")
+                "images/"+DATED_IMAGE_FOLDER+"/"+result+str(secondspast)+"Imagef1.png")
             the_imagef2 = artmaker.apply_random_filter(the_image)
             the_imagef2.save(
-                "images/"+DATED_IMAGE_FOLDER+"/"+result+"Imagef2.png")
+                "images/"+DATED_IMAGE_FOLDER+"/"+result+str(secondspast)+"Imagef2.png")
             the_imagef3 = artmaker.apply_random_filter(the_image)
             the_imagef3.save(
-                "images/"+DATED_IMAGE_FOLDER+"/"+result+"Imagef3.png")
+                "images/"+DATED_IMAGE_FOLDER+"/"+result+str(secondspast)+"Imagef3.png")
             print("Success in id:" + str(thread_id) + " Images generated and saved as "+result +
                   "Image[f1-f3].png in folder: images/"+DATED_IMAGE_FOLDER)
-            print(f"Time elapsed: {(time.process_time()-start)} seconds")
+            print(f"Time elapsed: {str(secondspast)} seconds")
             tracker.state()
 
 
@@ -102,13 +103,24 @@ if __name__ == "__main__":
     time.sleep(10)
 
     cifar_tracker = cifar10utils.CiFarClassTracker()
+    cifar_tracker2 = cifar10utils.CiFarClassTracker()
+    cifar_tracker3 = cifar10utils.CiFarClassTracker()
 
     threads = []
     for n in range(1, 11):
         t = Thread(target=create_until_target_generated,
                    args=(cifar_tracker, n,))
+        t2 = Thread(target=create_until_target_generated,
+                    args=(cifar_tracker2, n,))
+        t3 = Thread(target=create_until_target_generated,
+                    args=(cifar_tracker3, n,))
+
         threads.append(t)
+        threads.append(t2)
+        threads.append(t3)
         t.start()
+        t2.start()
+        t3.start()
 
     for t in threads:
         t.join()
